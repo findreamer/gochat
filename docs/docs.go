@@ -30,7 +30,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/user/getUerList": {
+        "/user/getUserList": {
             "get": {
                 "tags": [
                     "用户列表"

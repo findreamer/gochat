@@ -10,7 +10,7 @@ paths:
             type: string
       tags:
       - 首页
-  /user/getUerList:
+  /user/getUserList:
     get:
       responses:
         "200":
