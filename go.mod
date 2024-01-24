@@ -10,6 +10,8 @@ require (
 	gorm.io/gorm v1.25.5
 )
 
+require github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2 // indirect
+
 require (
 	github.com/KyleBanks/depth v1.2.1 // indirect
 	github.com/bytedance/sonic v1.10.2 // indirect
