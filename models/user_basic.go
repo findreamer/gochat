@@ -18,6 +18,9 @@ type UserBasic struct {
 	ClientIp   string
 	clientPort string
 
+	// 密码校验字符串
+	Salt string
+
 	// 登陆时间
 	LoginTime *time.Time
 	// 下线时间
