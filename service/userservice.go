@@ -11,14 +11,38 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// GetUserList
-// @Sumary 用户列表
+// FindUserByNameAndPassoword
+// @Sumary 用户登陆
 // @Tags 用户模块
+// @param name formData string false "用户名"
+// @param password formData string false "密码"
 // @Success 200 {string} json {"code", "message"}
-// @Router /user/getUserList [get]
-func GetUserList(c *gin.Context) {
-	data := make([]*models.UserBasic, 10)
-	utils.DB.Find(&data)
+// @Router /user/findUserByNameAndPassoword [post]
+func FindUserByNameAndPassoword(c *gin.Context) {
+
+	name := c.PostForm("name")
+	password := c.PostForm("password")
+
+	user := models.FindUserByName(name)
+
+	if user.Name == "" {
+		c.JSON(200, gin.H{
+			"message": "该用户不存在",
+		})
+		return
+	}
+
+	flag := utils.ValidPassword(password, user.Salt, user.PassWord)
+
+	if !flag {
+		c.JSON(200, gin.H{
+			"message": "密码不正确 ",
+		})
+		return
+	}
+
+	pwd := utils.MakePassowrd(password, user.Salt)
+	data := models.FindUserByNameAndPassoword(name, pwd)
 
 	c.JSON(200, gin.H{
 		"message": data,
