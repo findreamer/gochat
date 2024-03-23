@@ -5,10 +5,13 @@ import (
 	"gochat/models"
 	"gochat/utils"
 	"math/rand"
+	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/asaskevich/govalidator"
 	"github.com/gin-gonic/gin"
+	"github.com/gorilla/websocket"
 )
 
 // FindUserByNameAndPassoword
@@ -155,4 +158,53 @@ func UpdateUser(c *gin.Context) {
 		"message": "修改用户成功",
 		"data":    user,
 	})
+}
+
+// 防止跨域站点伪造请求
+var upGrade = websocket.Upgrader{
+	CheckOrigin: func(r *http.Request) bool {
+		return true
+	},
+}
+
+func SendMsg(c *gin.Context) {
+
+	ws, err := upGrade.Upgrade(c.Writer, c.Request, nil)
+
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	// 延迟函数
+	defer func(ws *websocket.Conn) {
+		err = ws.Close()
+
+		if err != nil {
+			fmt.Println(err)
+		}
+	}(ws)
+
+	MsHandler(ws, c)
+}
+
+func MsHandler(ws *websocket.Conn, c *gin.Context) {
+
+	for {
+		msg, err := utils.Subscribe(c, utils.PublishKey)
+		if err != nil {
+			fmt.Println(err)
+		}
+
+		tm := time.Now().Format("2006-01-02 14:03:05")
+		m := fmt.Sprintf("[ws][%s]:%s", tm, msg)
+
+		err = ws.WriteMessage(1, []byte(m))
+
+		if err != nil {
+			fmt.Println("MessHandler err => ", err)
+		}
+
+	}
+
 }

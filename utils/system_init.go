@@ -1,12 +1,13 @@
 package utils
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"os"
 	"time"
 
-	"github.com/go-redis/redis"
+	"github.com/go-redis/redis/v8"
 	"github.com/spf13/viper"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -41,13 +42,6 @@ func InitRedis() {
 		MinIdleConns: viper.GetInt("redis.minIdleConn"),
 	})
 
-	pong, err := Red.Ping().Result()
-
-	if err != nil {
-		fmt.Println("Init Redis err: ", err)
-	} else {
-		fmt.Println("Redis has been inited successful", pong)
-	}
 }
 
 func InitMysql() {
@@ -61,4 +55,29 @@ func InitMysql() {
 		},
 	)
 	DB, _ = gorm.Open(mysql.Open(viper.GetString("mysql.dns")), &gorm.Config{Logger: newLogger})
+}
+
+const (
+	PublishKey = "webscket"
+)
+
+// 发布消息到redis
+func Publish(ctx context.Context, channel string, msg string) error {
+	var err error
+
+	err = Red.Publish(ctx, channel, msg).Err()
+	return err
+}
+
+// 订阅 redis 消息
+func Subscribe(ctx context.Context, channel string) (string, error) {
+
+	sub := Red.Subscribe(ctx, channel)
+
+	fmt.Println("Subscribe ==> ", sub)
+
+	msg, err := sub.ReceiveMessage(ctx)
+
+	return msg.Payload, err
+
 }
