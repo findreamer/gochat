@@ -27,6 +27,7 @@ func FindUserByNameAndPassoword(c *gin.Context) {
 
 	if user.Name == "" {
 		c.JSON(200, gin.H{
+			"code":    -1,
 			"message": "该用户不存在",
 		})
 		return
@@ -36,6 +37,7 @@ func FindUserByNameAndPassoword(c *gin.Context) {
 
 	if !flag {
 		c.JSON(200, gin.H{
+			"code":    -1,
 			"message": "密码不正确 ",
 		})
 		return
@@ -45,7 +47,9 @@ func FindUserByNameAndPassoword(c *gin.Context) {
 	data := models.FindUserByNameAndPassoword(name, pwd)
 
 	c.JSON(200, gin.H{
-		"message": data,
+		"code":    0,
+		"message": "登陆成功",
+		"data":    data,
 	})
 }
 
@@ -69,6 +73,7 @@ func CreateUser(c *gin.Context) {
 	data := models.FindUserByName(user.Name)
 	if data.Name != "" {
 		c.JSON(-1, gin.H{
+			"code":    -1,
 			"message": "用户名已注册",
 		})
 		return
@@ -76,15 +81,18 @@ func CreateUser(c *gin.Context) {
 
 	if password != repassword {
 		c.JSON(-1, gin.H{
+			"code":    -1,
 			"message": "两次密码不一致",
 		})
 		return
 	}
 
 	user.PassWord = utils.MakePassowrd(password, salt)
+	user.Salt = salt
 	models.CreateUser(user)
 
 	c.JSON(200, gin.H{
+		"code":    0,
 		"message": "新增用户成功",
 	})
 }
@@ -103,7 +111,9 @@ func DeleteUser(c *gin.Context) {
 	models.DeleteUser(user)
 
 	c.JSON(200, gin.H{
+		"code":    0,
 		"message": "删除用户成功",
+		"data":    user,
 	})
 }
 
@@ -131,6 +141,7 @@ func UpdateUser(c *gin.Context) {
 	if err != nil {
 		fmt.Println(err)
 		c.JSON(200, gin.H{
+			"code":    -1,
 			"message": "修改参数不匹配",
 			"data":    err,
 		})
@@ -140,6 +151,8 @@ func UpdateUser(c *gin.Context) {
 	models.UpdateUser(user)
 
 	c.JSON(200, gin.H{
+		"code":    0,
 		"message": "修改用户成功",
+		"data":    user,
 	})
 }
