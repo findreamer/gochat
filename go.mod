@@ -18,6 +18,7 @@ require (
 	github.com/go-redis/redis v6.15.9+incompatible // indirect
 	github.com/go-redis/redis/v8 v8.11.5 // indirect
 	github.com/gorilla/websocket v1.5.1 // indirect
+	gopkg.in/fatih/set.v0 v0.2.1 // indirect
 )
 
 require (
